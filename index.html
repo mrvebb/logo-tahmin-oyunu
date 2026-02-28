@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title>LOGOYU TAHMİN ET!</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #e5e7eb;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(90deg, #16a34a, #ef4444, #f97316, #3b82f6);
+      background-size: 400% 400%;
+      animation: gradient 12s ease infinite;
+    }
+
+    @keyframes gradient {
+      0% { background-position: 0% 50%; }
+      25% { background-position: 50% 50%; }
+      50% { background-position: 100% 50%; }
+      75% { background-position: 50% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .card {
+      background: radial-gradient(circle at top left, #1d4ed8, #020617);
+      border-radius: 24px;
+      padding: 32px 28px 28px;
+      width: min(420px, 100vw - 32px);
+      box-shadow: 0 20px 50px rgba(15, 23, 42, 0.9);
+    }
+
+    h1 {
+      margin: 0 0 16px;
+      font-size: 22px;
+      letter-spacing: 0.03em;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: #9ca3af;
+      margin-bottom: 24px;
+    }
+
+    .image-wrapper {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .product-image {
+      width: 180px;
+      height: 180px;
+      object-fit: contain;
+      border-radius: 28px;
+      background: linear-gradient(180deg,#020617,#040616);
+      padding: 18px;
+      display: block;
+      box-shadow: 0 12px 30px rgba(2,6,23,0.6);
+      transition: filter 0.35s ease, transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .blurred {
+      filter: blur(8px) brightness(0.9) saturate(0.85);
+      opacity: 0.98;
+      transform: scale(0.98);
+    }
+
+    .revealed {
+      transform: scale(1.06);
+      filter: none;
+      box-shadow: 0 18px 40px rgba(2,6,23,0.8), 0 4px 18px rgba(99,102,241,0.08);
+    }
+
+    .options {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .option-btn {
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      background: rgba(15, 23, 42, 0.9);
+      color: #e5e7eb;
+      padding: 10px 12px;
+      border-radius: 999px;
+      text-align: left;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: background 0.2s, border-color 0.2s, transform 0.1s;
+    }
+
+    .option-btn span.label {
+      flex: 1;
+    }
+
+    .option-btn:hover {
+      background: rgba(30, 64, 175, 0.8);
+      border-color: #60a5fa;
+      transform: translateY(-1px);
+    }
+
+    .option-btn.correct {
+      background: rgba(22, 163, 74, 0.18);
+      border-color: #22c55e;
+    }
+
+    .option-btn.wrong {
+      background: rgba(220, 38, 38, 0.16);
+      border-color: #f97373;
+    }
+
+    .badge {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      margin-left: 8px;
+    }
+
+    .status {
+      font-size: 13px;
+      min-height: 18px;
+      margin-bottom: 10px;
+    }
+
+    .status.correct {
+      color: #4ade80;
+    }
+
+    .status.wrong {
+      color: #fb7185;
+    }
+
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 6px;
+      font-size: 12px;
+      color: #9ca3af;
+    }
+
+    .next-btn {
+      border-radius: 999px;
+      border: none;
+      padding: 8px 14px;
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: white;
+      font-size: 13px;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(21, 128, 61, 0.35);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.2s;
+    }
+
+    .next-btn:disabled {
+      opacity: 0.5;
+      cursor: default;
+      box-shadow: none;
+    }
+
+    .next-btn:not(:disabled):hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 25px rgba(21, 128, 61, 0.5);
+    }
+    .app { display: flex; gap: 20px; align-items: flex-start; padding: 24px; }
+    .leaderboard { width: 260px; }
+    /* sabit sağda ortala */
+    .leaderboard {
+      position: fixed;
+      right: 24px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 50;
+    }
+
+    @media (max-width: 900px) {
+      .leaderboard { position: static; transform: none; width: 100%; }
+      .app { flex-direction: column; align-items: center; }
+    }
+
+    /* Mobile specific tweaks */
+    @media (max-width: 600px) {
+      .card { width: 92vw; padding: 20px; }
+      .product-image { width: 140px; height: 140px; padding: 12px; }
+      .option-btn { padding: 14px 16px; font-size: 16px; }
+      .start-box { min-width: auto; width: 92vw; }
+      .start-box input { width: 100%; }
+      .footer { gap: 8px; }
+      #timer { font-size: 18px; }
+
+      /* make leaderboard a bottom bar */
+      .leaderboard { position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%); right: auto; width: calc(100% - 32px); max-width: 420px; }
+      .lb-card { display:flex; gap:8px; align-items:center; justify-content:space-between; padding:10px 12px; }
+      #leaderboardList { display:flex; gap:8px; overflow:auto; white-space:nowrap; }
+      #leaderboardList .lb-entry { display:inline-flex; flex-direction:column; padding:6px 8px; min-width:80px; }
+    }
+    .lb-card { background: linear-gradient(circle at top left, #0b1220, #071028); padding: 18px; border-radius: 16px; color:#e5e7eb; box-shadow:0 12px 30px rgba(2,6,23,0.7); }
+    .lb-card h3 { margin: 0 0 10px; font-size: 16px; }
+    .lb-entry { display:flex; justify-content:space-between; padding:8px 6px; border-radius:8px; align-items:center; }
+    .lb-entry + .lb-entry { margin-top:6px; }
+    .start-overlay { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(2,6,23,0.6); }
+    .start-box { background:linear-gradient(180deg,#081028,#031029); padding:20px; border-radius:12px; box-shadow:0 10px 30px rgba(2,6,23,0.7); color:#e5e7eb; display:flex; flex-direction:column; gap:10px; min-width:300px; }
+    .start-box input { padding:8px 10px; border-radius:8px; border:1px solid rgba(148,163,184,0.15); background:rgba(255,255,255,0.03); color:inherit; }
+    #timer { font-weight:600; color:#93c5fd; }
+    /* larger timer and progress while playing */
+    body.playing #timer { font-size: 20px; }
+    body.playing #progress { font-size: 16px; font-weight: 700; color:#e6f2ff; }
+    .result-box { display:none; gap:8px; }
+    .result-box.show { display:flex; flex-direction:column; align-items:center; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="card">
+    <h1>LOGOYU TAHMİN ET!</h1>
+    <div class="subtitle">BULANIK İKONU TAHMİN ET</div>
+
+    <div class="image-wrapper">
+      <img id="productImage" class="product-image blurred" src="" alt="Google Product" />
+    </div>
+
+    <div id="options" class="options"></div>
+
+    <div id="status" class="status"></div>
+
+    <div class="footer">
+      <div id="progress"></div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <div id="timer" style="min-width:80px">00:00.0</div>
+        <button id="nextBtn" class="next-btn" disabled>
+          Sonraki
+          <span>➜</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <aside class="leaderboard">
+    <div class="lb-card">
+      <h3>Top 5</h3>
+      <div id="leaderboardList"></div>
+    </div>
+  </aside>
+
+  <!-- Start overlay -->
+  <div id="startOverlay" class="start-overlay">
+    <div class="start-box">
+      <div id="startForm" class="start-form">
+        <h2>Oyuna Hoşgeldin</h2>
+        <label>İsim:</label>
+        <input id="playerName" placeholder="Adınızı girin" />
+        <button id="startBtn" class="next-btn">Başla</button>
+      </div>
+
+      <div id="resultBox" class="result-box">
+        <h2 id="resultTitle">Tebrikler!</h2>
+        <div id="resultText" style="text-align:center"></div>
+        <button id="replayBtn" class="next-btn">Tekrar Oyna</button>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <script>
+    // Buraya resim dosyalarının isimlerini kendi klasör yapına göre ayarla:
+    const products = [
+      { name: "Google",         file: "ggl.png" },      // Ana Google logosu (ggl.png mevcut)
+      { name: "Chrome",         file: "chrme.png" },
+      { name: "Dino",    file: "dinoo.png" },
+      { name: "Flutter",        file: "flutter.png" },
+      { name: "Firebase",       file: "firebase.png" },
+      { name: "Drive",   file: "drive.jpg" },
+      { name: "Google Meet",    file: "meet.png" },
+      { name: "Gmail",          file: "gmail.jpg" },
+      { name: "Google Maps",    file: "maps.jpg" },
+      { name: "Google Docs",    file: "docs.webp" },
+      { name: "Gemini",         file: "gemini.png" }
+    ];
+
+    // Resimlerin bulunduğu klasör:
+    const IMAGE_BASE_PATH = "img/"; // örn: /assets/img/ yaparsan burayı değiştir
+
+    // Basit karıştırma fonksiyonu
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    const TOTAL_QUESTIONS = 7;
+    let order = [];
+    let currentIndex = 0;
+    let answered = false;
+    let score = 0;
+    let player = "";
+    let startTime = 0;
+    let timerInterval = null;
+
+    const imgEl = document.getElementById("productImage");
+    const optionsContainer = document.getElementById("options");
+    const statusEl = document.getElementById("status");
+    const progressEl = document.getElementById("progress");
+    const nextBtn = document.getElementById("nextBtn");
+
+    function createQuestion() {
+      answered = false;
+      nextBtn.disabled = true;
+      imgEl.classList.add("blurred");
+      imgEl.classList.remove("revealed");
+      statusEl.textContent = "";
+      statusEl.className = "status";
+      const product = products[order[currentIndex]];
+      imgEl.src = IMAGE_BASE_PATH + product.file;
+
+      // 3 şık üret: 1 doğru, 2 rastgele yanlış
+      const others = products.filter((_, idx) => idx !== order[currentIndex]);
+      shuffle(others);
+      const options = shuffle([product, others[0], others[1]]);
+
+      optionsContainer.innerHTML = "";
+
+      options.forEach((opt) => {
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.innerHTML = `<span class="label">${opt.name}</span><span class="badge">Şık</span>`;
+        btn.onclick = () => handleAnswer(btn, opt.name === product.name);
+        optionsContainer.appendChild(btn);
+      });
+
+      progressEl.textContent = `Soru ${currentIndex + 1} / ${TOTAL_QUESTIONS}`;
+    }
+
+    function handleAnswer(button, isCorrect) {
+      if (answered) return;
+      answered = true;
+
+      const allButtons = document.querySelectorAll(".option-btn");
+      allButtons.forEach((btn) => (btn.disabled = true));
+
+      imgEl.classList.remove("blurred");
+      imgEl.classList.add("revealed");
+
+      if (isCorrect) {
+        score++;
+        button.classList.add("correct");
+        statusEl.textContent = "Doğru! 🎉";
+        statusEl.classList.add("correct");
+      } else {
+        button.classList.add("wrong");
+        statusEl.textContent = "Yanlış, tekrar denersin. ✔️ doğru cevaptı.";
+        statusEl.classList.add("wrong");
+
+        // Doğru olanı da yeşil ile işaretle
+        const product = products[order[currentIndex]];
+        allButtons.forEach((btn) => {
+          if (btn.querySelector(".label").textContent === product.name) {
+            btn.classList.add("correct");
+          }
+        });
+      }
+
+      nextBtn.disabled = false;
+      nextBtn.textContent =
+        currentIndex < TOTAL_QUESTIONS - 1 ? "Sonraki ➜" : `Bitti! Skor: ${score}/${TOTAL_QUESTIONS}`;
+    }
+
+    // Timer helpers
+    function formatTime(ms) {
+      const totalSec = Math.floor(ms / 1000);
+      const min = Math.floor(totalSec / 60).toString().padStart(2, "0");
+      const sec = (totalSec % 60).toString().padStart(2, "0");
+      const tenth = Math.floor((ms % 1000) / 100);
+      return `${min}:${sec}.${tenth}`;
+    }
+
+    function startTimer() {
+      startTime = Date.now();
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        const elapsed = Date.now() - startTime;
+        document.getElementById("timer").textContent = formatTime(elapsed);
+      }, 100);
+    }
+
+    function stopTimer() {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+    }
+
+    // Leaderboard storage
+    function loadLeaderboard() {
+      try { return JSON.parse(localStorage.getItem("dino_leaderboard") || "[]"); } catch (e) { return []; }
+    }
+
+    function saveToLeaderboard(entry) {
+      const lb = loadLeaderboard();
+      lb.push(entry);
+      lb.sort((a,b) => {
+        if (b.score !== a.score) return b.score - a.score; // more correct first
+        return a.time - b.time; // faster first
+      });
+      localStorage.setItem("dino_leaderboard", JSON.stringify(lb.slice(0, 20)));
+      renderLeaderboard();
+    }
+
+    function renderLeaderboard() {
+      const list = loadLeaderboard();
+      const container = document.getElementById("leaderboardList");
+      container.innerHTML = "";
+      list.slice(0,5).forEach((e, i) => {
+        const div = document.createElement("div");
+        div.className = "lb-entry";
+        div.innerHTML = `<div>${i+1}. ${e.name}</div><div>${e.score}/${TOTAL_QUESTIONS} • ${formatTime(e.time)}</div>`;
+        container.appendChild(div);
+      });
+      if (list.length === 0) container.textContent = "Henüz skor yok";
+    }
+
+    // Next button logic
+    nextBtn.addEventListener("click", () => {
+      if (!answered) return;
+      if (currentIndex < TOTAL_QUESTIONS - 1) {
+        currentIndex++;
+        createQuestion();
+      } else {
+        // finish game
+        stopTimer();
+        const elapsed = Date.now() - startTime;
+        // save to leaderboard
+        saveToLeaderboard({ name: player || "Anon", score, time: elapsed, date: Date.now() });
+        // show results
+        const resultStr = `Doğru: ${score}/${TOTAL_QUESTIONS}\nSüre: ${formatTime(elapsed)}`;
+        resultText.textContent = resultStr;
+        document.getElementById("resultTitle").textContent = `Tebrikler, ${player}!`;
+        resultBox.classList.add('show');
+        startOverlay.style.display = 'flex';
+        document.body.classList.remove('playing');
+        nextBtn.disabled = true;
+      }
+    });
+
+    // Start button / overlay handling
+    const startBtn = document.getElementById("startBtn");
+    const startOverlay = document.getElementById("startOverlay");
+    const playerNameInput = document.getElementById("playerName");
+    const startForm = document.getElementById("startForm");
+    const resultBox = document.getElementById("resultBox");
+    const resultText = document.getElementById("resultText");
+    const replayBtn = document.getElementById("replayBtn");
+
+    function beginGame() {
+      player = playerNameInput.value.trim() || "Anon";
+      document.body.classList.add('playing');
+      startForm.style.display = 'none';
+      resultBox.classList.remove('show');
+      startOverlay.style.display = 'none';
+      // prepare game order
+      order = shuffle(products.map((_, i) => i)).slice(0, TOTAL_QUESTIONS);
+      currentIndex = 0;
+      score = 0;
+      renderLeaderboard();
+      startTimer();
+      createQuestion();
+    }
+
+    startBtn.addEventListener("click", () => {
+      const name = playerNameInput.value.trim();
+      if (!name) {
+        playerNameInput.focus();
+        return;
+      }
+      beginGame();
+    });
+
+    // allow Enter to start
+    playerNameInput.addEventListener("keydown", (e) => { if (e.key === "Enter") startBtn.click(); });
+
+    replayBtn.addEventListener('click', () => {
+      // show the start form again so user can change name or reuse
+      startForm.style.display = 'flex';
+      resultBox.classList.remove('show');
+      startOverlay.style.display = 'flex';
+      // keep previous name in input
+    });
+
+    // initial render
+    renderLeaderboard();
+  </script>
+</body>
+</html>
